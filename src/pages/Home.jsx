@@ -1,12 +1,21 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 
 export default function Home() {
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(() => {
+  const savedNotes = localStorage.getItem("notes");
+  return savedNotes ? JSON.parse(savedNotes) : [];
+});
 
+const [search, setSearch] = useState("");
+
+
+useEffect(() => {
+  localStorage.setItem("notes", JSON.stringify(notes));
+}, [notes]);
   const addNote = () => {
     setNotes([
       ...notes,
@@ -35,7 +44,11 @@ export default function Home() {
 
           {notes.length === 0 && <p>No notes yet.</p>}
 
-          {notes.map((note) => (
+          {notes
+  .filter((note) =>
+    note.title.toLowerCase().includes(search.toLowerCase())
+  )
+  .map((note) => (
             <div key={note.id}>
               <input
                 value={note.title}
